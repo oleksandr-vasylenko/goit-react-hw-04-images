@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { GlobalStyle } from '../../GlobalStyle';
 import { fetchImages } from 'components/services/api';
 
@@ -8,60 +8,49 @@ import { Searchbar } from 'components/Searchbar/Searchbar';
 import { ImageGallery } from 'components/ImageGallery/ImageGallery';
 import { Button } from 'components/Button/Button';
 
-export class App extends Component {
-  state = {
-    query: '',
-    page: 1,
-    images: [],
-    loading: false,
-  };
+export const App = () => {
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  componentDidUpdate(_, prevState) {
-    if (prevState.query !== this.state.query) {
-      this.setState({ loading: true });
-      fetchImages(this.state.query, this.state.page)
-        .then(data => {
-          this.setState({ images: data.hits });
-        })
-        .finally(() => this.setState({ loading: false }));
-    } else if (prevState.page !== this.state.page) {
-      this.setState({ loading: true });
-
-      fetchImages(this.state.query, this.state.page)
-        .then(data => {
-          this.setState({
-            images: [...prevState.images, ...data.hits],
-          });
-        })
-        .finally(() => this.setState({ loading: false }));
+  useEffect(() => {
+    if (query) {
+      setLoading(true);
+      fetchImages(query, page)
+        .then(data => setImages(data.hits))
+        .finally(() => setLoading(false));
     }
-  }
+  }, [query]);
 
-  handleFormSubmit = sumbittedQuery => {
-    this.setState({ query: sumbittedQuery, page: 1 });
+  useEffect(() => {
+    if (page > 1) {
+      setLoading(true);
+
+      fetchImages(query, page)
+        .then(data => setImages(prevImages => [...prevImages, ...data.hits]))
+        .finally(() => setLoading(false));
+    }
+  }, [page]);
+
+  const handleFormSubmit = sumbittedQuery => {
+    setQuery(sumbittedQuery);
+    setPage(1);
   };
 
-  loadMore = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
-  };
+  const loadMore = () => setPage(prevState => prevState + 1);
 
-  render() {
-    return (
-      <AppThumb>
-        <Searchbar onSubmit={this.handleFormSubmit} />
+  return (
+    <AppThumb>
+      <Searchbar onSubmit={handleFormSubmit} />
 
-        <ImageGallery images={this.state.images} />
+      <ImageGallery images={images} />
 
-        {this.state.loading && <Loader />}
+      {loading && <Loader />}
 
-        {this.state.images.length > 11 && (
-          <Button onLoadClick={this.loadMore}>LOAD MORE</Button>
-        )}
+      {images.length > 11 && <Button onLoadClick={loadMore}>LOAD MORE</Button>}
 
-        <GlobalStyle />
-      </AppThumb>
-    );
-  }
-}
+      <GlobalStyle />
+    </AppThumb>
+  );
+};
