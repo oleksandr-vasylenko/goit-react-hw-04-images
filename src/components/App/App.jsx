@@ -48,7 +48,6 @@ export class App extends Component {
   };
 
   render() {
-
     return (
       <AppThumb>
         <Searchbar onSubmit={this.handleFormSubmit} />
