@@ -16,27 +16,6 @@ export class App extends Component {
     loading: false,
   };
 
-  // componentDidUpdate(_, prevState) {
-  //   if (prevState.page !== this.state.page) {
-  //     this.setState({ loading: true });
-  //     fetchImages(this.state.query, this.state.page)
-  //       .then(data => {
-  //         this.setState({
-  //           images: [...prevState.images, ...data.hits],
-  //         });
-  //       })
-  //       .finally(() => this.setState({ loading: false }));
-
-  //   } else if (prevState.query !== this.state.query) {
-  //     this.setState({ loading: true });
-  //     fetchImages(this.state.query, this.state.page)
-  //       .then(data => {
-  //         this.setState({ images: data.hits });
-  //       })
-  //       .finally(() => this.setState({ loading: false }));
-  //   }
-  // }
-
   componentDidUpdate(_, prevState) {
     if (prevState.query !== this.state.query) {
       this.setState({ loading: true });
@@ -69,7 +48,7 @@ export class App extends Component {
   };
 
   render() {
-    // console.log(this.state.images.length % 12 < 12);
+
     return (
       <AppThumb>
         <Searchbar onSubmit={this.handleFormSubmit} />
